@@ -1,0 +1,165 @@
+<% layout("./listing/layouts/boilerplate") %>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <h3 class="mb-0"><i class="fas fa-calendar-check me-2"></i>Book Your Stay</h3>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Listing Info -->
+                    <div class="d-flex mb-4 p-3 bg-light rounded">
+                        <% if(listing.images && listing.images.length > 0) { %>
+                            <img src="<%= listing.images[0].url %>" alt="<%= listing.title %>" class="rounded" style="width: 120px; height: 80px; object-fit: cover;">
+                        <% } else { %>
+                            <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 120px; height: 80px;">
+                                <i class="fas fa-home text-white fa-2x"></i>
+                            </div>
+                        <% } %>
+                        <div class="ms-3">
+                            <h5 class="mb-1"><%= listing.title %></h5>
+                            <p class="text-muted mb-1"><i class="fas fa-map-marker-alt me-1"></i><%= listing.location %>, <%= listing.country %></p>
+                            <p class="mb-0"><strong>₹<%= listing.price %></strong> / night</p>
+                        </div>
+                    </div>
+
+                    <form action="/bookings/create/<%= listing._id %>" method="POST" class="needs-validation" novalidate>
+                        <!-- Dates -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="checkIn" class="form-label fw-bold">Check-in Date</label>
+                                <input type="date" name="checkIn" id="checkIn" class="form-control" required min="<%= new Date().toISOString().split('T')[0] %>">
+                                <div class="invalid-feedback">Please select check-in date</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="checkOut" class="form-label fw-bold">Check-out Date</label>
+                                <input type="date" name="checkOut" id="checkOut" class="form-control" required>
+                                <div class="invalid-feedback">Please select check-out date</div>
+                            </div>
+                        </div>
+
+                        <!-- Guests -->
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="adults" class="form-label fw-bold">Adults</label>
+                                <select name="adults" id="adults" class="form-select">
+                                    <% for(let i = 1; i <= 10; i++) { %>
+                                        <option value="<%= i %>"><%= i %> <%= i === 1 ? 'Adult' : 'Adults' %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="children" class="form-label fw-bold">Children</label>
+                                <select name="children" id="children" class="form-select">
+                                    <% for(let i = 0; i <= 5; i++) { %>
+                                        <option value="<%= i %>"><%= i %> <%= i === 1 ? 'Child' : 'Children' %></option>
+                                    <% } %>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Guest Info -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="fas fa-user me-2"></i>Guest Information</h5>
+
+                        <div class="mb-3">
+                            <label for="fullName" class="form-label fw-bold">Full Name</label>
+                            <input type="text" name="fullName" id="fullName" class="form-control" required placeholder="Enter your full name">
+                            <div class="invalid-feedback">Please enter your full name</div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label fw-bold">Email</label>
+                                <input type="email" name="email" id="email" class="form-control" required placeholder="your@email.com">
+                                <div class="invalid-feedback">Please enter a valid email</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label fw-bold">Phone Number</label>
+                                <input type="tel" name="phone" id="phone" class="form-control" placeholder="+91 9876543210">
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="specialRequests" class="form-label fw-bold">Special Requests (Optional)</label>
+                            <textarea name="specialRequests" id="specialRequests" class="form-control" rows="3" placeholder="Any special requests or requirements..."></textarea>
+                        </div>
+
+                        <!-- Price Summary -->
+                        <div class="bg-light p-3 rounded mb-4">
+                            <h6 class="mb-2">Price Details</h6>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>₹<%= listing.price %> x <span id="nights">0</span> nights</span>
+                                <span id="subtotal">₹0</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-1">
+                                <span>Service fee</span>
+                                <span id="serviceFee">₹0</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold text-primary">
+                                <span>Total</span>
+                                <span id="totalPrice">₹0</span>
+                            </div>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                                <i class="fas fa-credit-card me-2"></i>Proceed to Payment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const pricePerNight = <%= listing.price %>;
+    const checkInInput = document.getElementById('checkIn');
+    const checkOutInput = document.getElementById('checkOut');
+    const nightsDisplay = document.getElementById('nights');
+    const subtotalDisplay = document.getElementById('subtotal');
+    const serviceFeeDisplay = document.getElementById('serviceFee');
+    const totalPriceDisplay = document.getElementById('totalPrice');
+
+    function calculatePrice() {
+        const checkIn = new Date(checkInInput.value);
+        const checkOut = new Date(checkOutInput.value);
+        
+        if (checkIn && checkOut && checkOut > checkIn) {
+            const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+            const subtotal = nights * pricePerNight;
+            const serviceFee = Math.round(subtotal * 0.12); // 12% service fee
+            const total = subtotal + serviceFee;
+            
+            nightsDisplay.textContent = nights;
+            subtotalDisplay.textContent = '₹' + subtotal.toLocaleString();
+            serviceFeeDisplay.textContent = '₹' + serviceFee.toLocaleString();
+            totalPriceDisplay.textContent = '₹' + total.toLocaleString();
+        }
+    }
+
+    checkInInput.addEventListener('change', function() {
+        checkOutInput.min = this.value;
+        calculatePrice();
+    });
+
+    checkOutInput.addEventListener('change', calculatePrice);
+
+    // Form validation
+    document.addEventListener('DOMContentLoaded', function() {
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.prototype.slice.call(forms).forEach(function(form) {
+            form.addEventListener('submit', function(event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+    });
+</script>

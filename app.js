@@ -24,6 +24,7 @@ const reviewRouter = require("./routes/review.js");
 const userRouter = require("./routes/user.js");
 const adminRouter = require("./routes/admin.js");
 const setupRouter = require("./routes/setup.js");
+const bookingRouter = require("./routes/booking.js");
 const listingController = require("./controllers/listing.js");
 
 const dbUrl = process.env.ATLASDB_URL;
@@ -115,6 +116,7 @@ app.use("/listings", listingRouter);
 app.use("/listings/:id/reviews", reviewRouter);
 app.use("/", userRouter);
 app.use("/admin", adminRouter);
+app.use("/bookings", bookingRouter);
 
 // Static Pages
 app.get("/privacy", (req, res) => {

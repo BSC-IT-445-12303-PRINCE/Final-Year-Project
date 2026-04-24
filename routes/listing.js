@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const wrapAsync = require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.js");
-const {isLoggedIn, isOwner, validateListing} = require("../middleware.js");
+const {isLoggedIn, isOwner, validateListing, isAdmin} = require("../middleware.js");
 const listingController = require("../controllers/listing.js");
 const multer  = require('multer')
 const {storage} = require("../cloudconfig.js");
@@ -12,21 +12,21 @@ const upload = multer({ storage });
 
 router.route("/")
 .get(wrapAsync(listingController.index))
-.post(isLoggedIn, validateListing, upload.array('listing[images]', 10), wrapAsync(listingController.createListing));
+.post(isAdmin, validateListing, upload.array('listing[images]', 10), wrapAsync(listingController.createListing));
 
-//New Route
-router.get("/new", isLoggedIn, listingController.renderNewForm);
+//New Route - Admin Only
+router.get("/new", isAdmin, listingController.renderNewForm);
 
 
 router.route("/:id")
 .get(wrapAsync(listingController.showListing))
-.put(isLoggedIn, isOwner, upload.array('listing[images]', 10), validateListing, wrapAsync(listingController.updateListing))
-.delete(isLoggedIn, isOwner, wrapAsync(listingController.destroyListing));
+.put(isAdmin, upload.array('listing[images]', 10), validateListing, wrapAsync(listingController.updateListing))
+.delete(isAdmin, wrapAsync(listingController.destroyListing));
 
 
 
-//Edit Route
-router.get("/:id/edit", isLoggedIn, isOwner, wrapAsync(listingController.renderEditForm));
+//Edit Route - Admin Only
+router.get("/:id/edit", isAdmin, wrapAsync(listingController.renderEditForm));
 
 
 module.exports = router; 

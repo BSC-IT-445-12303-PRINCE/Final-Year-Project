@@ -3,6 +3,7 @@ const User = require("../models/user");
 const Listing = require("../models/listing");
 const Review = require("../models/review");
 const Contact = require("../models/contact");
+const Booking = require("../models/booking");
 
 module.exports.renderAdminLoginForm = (req, res) => {
     res.render("./listing/users/adminLogin.ejs");
@@ -128,6 +129,9 @@ module.exports.renderDashboard = async (req, res) => {
         const totalReviews = await Review.countDocuments();
         const totalContacts = await Contact.countDocuments();
         const newContacts = await Contact.countDocuments({ status: 'new' });
+        const totalBookings = await Booking.countDocuments();
+        const pendingBookings = await Booking.countDocuments({ status: 'pending' });
+        const confirmedBookings = await Booking.countDocuments({ status: 'confirmed' });
         
         res.render("./listing/users/adminDashboard.ejs", { 
             admin, 
@@ -135,7 +139,10 @@ module.exports.renderDashboard = async (req, res) => {
             totalListings,
             totalReviews,
             totalContacts,
-            newContacts
+            newContacts,
+            totalBookings,
+            pendingBookings,
+            confirmedBookings
         });
     } catch (error) {
         console.error("Error in renderDashboard:", error);

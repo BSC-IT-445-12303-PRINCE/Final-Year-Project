@@ -1,0 +1,123 @@
+<% layout("./listing/layouts/boilerplate") %>
+
+<div class="container mt-5">
+    <h2 class="mb-4"><i class="fas fa-suitcase me-2 text-primary"></i>My Bookings</h2>
+
+    <% if (bookings.length === 0) { %>
+        <div class="text-center py-5">
+            <i class="fas fa-calendar-times fa-4x text-muted mb-3"></i>
+            <h4 class="text-muted">No bookings yet</h4>
+            <p class="text-muted">Start exploring and book your perfect stay!</p>
+            <a href="/listings" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <i class="fas fa-search me-1"></i>Explore Listings
+            </a>
+        </div>
+    <% } else { %>
+        <div class="row">
+            <% bookings.forEach(function(booking) { %>
+                <div class="col-md-6 mb-4">
+                    <div class="card shadow h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <span class="badge 
+                                <%= booking.status === 'confirmed' ? 'bg-success' : '' %>
+                                <%= booking.status === 'pending' ? 'bg-warning' : '' %>
+                                <%= booking.status === 'cancelled' ? 'bg-danger' : '' %>
+                                <%= booking.status === 'completed' ? 'bg-info' : '' %>
+                                text-uppercase">
+                                <%= booking.status %>
+                            </span>
+                            <small class="text-muted">
+                                <i class="fas fa-calendar me-1"></i>
+                                <%= new Date(booking.createdAt).toDateString() %>
+                            </small>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex mb-3">
+                                <% if(booking.listing.images && booking.listing.images.length > 0) { %>
+                                    <img src="<%= booking.listing.images[0].url %>" alt="<%= booking.listing.title %>" class="rounded" style="width: 100px; height: 70px; object-fit: cover;">
+                                <% } else { %>
+                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="width: 100px; height: 70px;">
+                                        <i class="fas fa-home text-white fa-2x"></i>
+                                    </div>
+                                <% } %>
+                                <div class="ms-3">
+                                    <h5 class="mb-1"><%= booking.listing.title %></h5>
+                                    <p class="text-muted mb-0 small">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        <%= booking.listing.location %>
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="row text-center mb-3">
+                                <div class="col-4 border-end">
+                                    <small class="text-muted d-block">Check-in</small>
+                                    <strong><%= new Date(booking.checkIn).toLocaleDateString() %></strong>
+                                </div>
+                                <div class="col-4 border-end">
+                                    <small class="text-muted d-block">Check-out</small>
+                                    <strong><%= new Date(booking.checkOut).toLocaleDateString() %></strong>
+                                </div>
+                                <div class="col-4">
+                                    <small class="text-muted d-block">Nights</small>
+                                    <strong><%= booking.totalNights %></strong>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="text-muted">Total:</span>
+                                    <strong class="text-primary h5">₹<%= booking.totalPrice.toLocaleString() %></strong>
+                                </div>
+                                <span class="badge 
+                                    <%= booking.payment.status === 'paid' ? 'bg-success' : 'bg-secondary' %>">
+                                    <i class="fas fa-<%= booking.payment.status === 'paid' ? 'check' : 'clock' %> me-1"></i>
+                                    <%= booking.payment.status %>
+                                </span>
+                            </div>
+
+                            <% if (booking.guestInfo.specialRequests) { %>
+                                <hr class="my-3">
+                                <small class="text-muted">
+                                    <strong>Special Requests:</strong><br>
+                                    <%= booking.guestInfo.specialRequests %>
+                                </small>
+                            <% } %>
+                        </div>
+                        <div class="card-footer bg-light">
+                            <% if (booking.status === 'pending' && booking.payment.status !== 'paid') { %>
+                                <div class="d-flex justify-content-between">
+                                    <a href="/bookings/<%= booking._id %>/payment" class="btn btn-success btn-sm">
+                                        <i class="fas fa-credit-card me-1"></i>Pay Now
+                                    </a>
+                                    <form action="/bookings/<%= booking._id %>/cancel" method="POST" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this booking?')">
+                                            <i class="fas fa-times me-1"></i>Cancel
+                                        </button>
+                                    </form>
+                                </div>
+                            <% } else if (booking.status === 'confirmed') { %>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="text-success">
+                                        <i class="fas fa-check-circle me-1"></i>Confirmed
+                                    </span>
+                                    <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye me-1"></i>View Listing
+                                    </a>
+                                </div>
+                            <% } else if (booking.status === 'cancelled') { %>
+                                <span class="text-danger">
+                                    <i class="fas fa-times-circle me-1"></i>Cancelled
+                                </span>
+                            <% } else { %>
+                                <a href="/listings/<%= booking.listing._id %>" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-eye me-1"></i>View Listing
+                                </a>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
+            <% }); %>
+        </div>
+    <% } %>
+</div>

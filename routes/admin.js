@@ -37,4 +37,12 @@ router.get("/contacts/:id", isAdmin, adminController.getContactDetail);
 router.post("/contacts/:id/status", isAdmin, adminController.updateContactStatus);
 router.delete("/contacts/:id", isAdmin, adminController.deleteContact);
 
+// ============== BOOKINGS MANAGEMENT ==============
+const bookingController = require("../controllers/booking.js");
+router.get("/bookings", isAdmin, bookingController.getAllBookings);
+router.get("/bookings/:id", isAdmin, bookingController.getBookingDetail);
+router.post("/bookings/:id/status", isAdmin, bookingController.updateBookingStatus);
+router.post("/bookings/:id/payment", isAdmin, bookingController.updatePaymentStatus);
+router.delete("/bookings/:id", isAdmin, bookingController.deleteBooking);
+
 module.exports = router;
