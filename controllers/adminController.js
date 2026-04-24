@@ -234,10 +234,19 @@ module.exports.renderNewListingForm = (req, res) => {
 // Create new listing (admin only)
 module.exports.createListing = async (req, res) => {
     try {
-        const { title, description, price, location, country, category, image } = req.body;
+        const { title, description, price, location, country, category } = req.body;
         
         // Get the admin user ID from session
         const admin = await Admin.findById(req.session.adminId);
+        
+        // Handle uploaded images
+        let images = [];
+        if (req.files && req.files.length > 0) {
+            images = req.files.map(file => ({
+                url: file.path,
+                filename: file.filename
+            }));
+        }
         
         // Create new listing with admin as owner
         const newListing = new Listing({
@@ -247,7 +256,7 @@ module.exports.createListing = async (req, res) => {
             location,
             country,
             category,
-            images: image ? [{ url: image, filename: "admin_upload" }] : [],
+            images: images,
             owner: null // Admin listings don't have a regular user owner
         });
         

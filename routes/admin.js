@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router();
 const adminController = require("../controllers/adminController");
 const { isAdmin } = require("../middleware.js");
+const multer = require('multer');
+const { storage } = require("../cloudconfig.js");
+const upload = multer({ storage });
 
 // Login routes (no auth required)
 router.route("/login")
@@ -22,7 +25,7 @@ router.delete("/users/:id", isAdmin, adminController.deleteUser);
 // ============== LISTINGS MANAGEMENT ==============
 router.get("/listings", isAdmin, adminController.getAllListings);
 router.get("/listings/new", isAdmin, adminController.renderNewListingForm);
-router.post("/listings", isAdmin, adminController.createListing);
+router.post("/listings", isAdmin, upload.array('images', 5), adminController.createListing);
 router.delete("/listings/:id", isAdmin, adminController.deleteListing);
 
 // ============== REVIEWS MANAGEMENT ==============
