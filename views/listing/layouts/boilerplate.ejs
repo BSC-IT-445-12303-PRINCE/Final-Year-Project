@@ -12,10 +12,63 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/css/rating.css">
-<link rel="stylesheet" href="/css/rating.css">
+    <link rel="stylesheet" href="/css/rating.css">
 
+    <!-- Dark Mode Styles -->
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #212529;
+            --card-bg: #ffffff;
+            --navbar-bg: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --border-color: #dee2e6;
+            --footer-bg: #f8f9fa;
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1d29;
+            --text-color: #e4e6eb;
+            --card-bg: #242636;
+            --navbar-bg: linear-gradient(135deg, #1e3a8a 0%, #581c87 100%);
+            --border-color: #3f3f46;
+            --footer-bg: #1a1d29;
+        }
+        
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            transition: background-color 0.3s, color 0.3s;
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-color: var(--border-color);
+        }
+        
+        .navbar {
+            background: var(--navbar-bg) !important;
+        }
+        
+        footer {
+            background-color: var(--footer-bg) !important;
+        }
+        
+        .dark-mode-toggle {
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .dark-mode-toggle:hover {
+            background: rgba(255,255,255,0.3);
+        }
+    </style>
 </head>
-<body>
+<body data-theme="light">
     <%- include("../includes/navbar.ejs") %>
     <div class="container">
         <%- include("../includes/flash.ejs") %>
@@ -24,6 +77,32 @@
     <%- include("../includes/footer.ejs") %>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     <script src="/js/script.js"></script>
+
+    <!-- Dark Mode Script -->
+    <script>
+        // Check for saved theme preference
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.body.setAttribute('data-theme', currentTheme);
+        updateToggleIcon(currentTheme);
+        
+        function toggleDarkMode() {
+            const currentTheme = document.body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            document.body.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateToggleIcon(newTheme);
+        }
+        
+        function updateToggleIcon(theme) {
+            const toggle = document.getElementById('darkModeToggle');
+            if (toggle) {
+                toggle.innerHTML = theme === 'light' 
+                    ? '<i class="fas fa-moon"></i>' 
+                    : '<i class="fas fa-sun"></i>';
+            }
+        }
+    </script>
 
 </body> 
 </html>
